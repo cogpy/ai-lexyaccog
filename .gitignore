@@ -1,0 +1,37 @@
+# Build artifacts
+opencog-core/build/
+opencog-core/lib/
+*.o
+*.a
+*.so
+*.dylib
+
+# Parser generated files
+*.tab.c
+*.tab.h
+*.yy.c
+*.output
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnp/
+.pnp.js
+
+# TypeScript
+*.tsbuildinfo
+dist/
+lib/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
