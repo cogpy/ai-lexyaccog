@@ -92,11 +92,12 @@ Performance: Total latency < 100μs for local, < 10ms for distributed
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
 Source Files:
-├─ atomspace.c (329 LOC)       ──┐
-├─ distributed.c (415 LOC)     ──┤
-├─ atom_ops.asm (229 LOC)      ──┼──► Compilation
-├─ cognitive_grammar.y (72)    ──┤
-└─ cognitive_grammar.l (97)    ──┘
+├─ atomspace.c (329 LOC)          ──┐
+├─ distributed.c (415 LOC)        ──┤
+├─ atom_ops.asm (229 LOC)         ──┼──► Compilation
+├─ cognitive_grammar.y (72 LOC)   ──┤
+└─ cognitive_grammar.l (97 LOC)   ──┘
+   Total Parser: 169 LOC
                 │
                 ▼
         Compiled Objects
@@ -119,12 +120,16 @@ Source Files:
 
 Operation                    | Target      | Implementation
 ────────────────────────────────────────────────────────────────────────────────
-Atom Creation               | < 100ns     | malloc + ref count + hash insert
-Atom Lookup (by ID)         | < 50ns      | Hash table O(1)
-Truth Value Update          | < 20ns      | SSE aligned store (ASM)
-Pattern Match (1000 atoms)  | < 10μs      | AVX2 SIMD vectorized
-IPC Message Send            | < 1μs       | Shared memory write
-Shared Memory Lock          | < 100ns     | Atomic CAS operation
-Consensus Round (3 nodes)   | < 10ms      | Paxos-like protocol
+Atom Creation               | < 1μs       | malloc + ref count + hash insert
+Atom Lookup (by ID)         | < 500ns     | Hash table O(1) (L1 cache hit)
+Truth Value Update          | < 100ns     | SSE aligned store (ASM)
+Pattern Match (1000 atoms)  | < 100μs     | AVX2 SIMD vectorized
+IPC Message Send            | < 5μs       | Message queue + copy
+Shared Memory Write         | < 1μs       | Memory copy to shared segment
+Shared Memory Lock          | < 500ns     | Atomic CAS operation
+Consensus Round (3 nodes)   | < 50ms      | Paxos-like protocol + network
 Memory per Atom             | ~200 bytes  | Struct + outgoing/incoming sets
+
+Note: Performance varies based on cache state, system load, and hardware.
+L1 cache hits provide best-case latency; cache misses add 100-200ns overhead.
 
